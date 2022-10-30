@@ -1,17 +1,41 @@
 import React from 'react'
 import Logo from './img/logo.png'
 import {MdShoppingBasket} from 'react-icons/md'
+import { motion } from 'framer-motion'
+import { getAuth , signInWithPopup , GoogleAuthProvider} from 'firebase/auth'
+import { app } from '../firebase.config'
+
 import Avatar from './img/avatar.png'
+import { Link } from 'react-router-dom'
+import { useDispatch, useSelector } from 'react-redux'
+import { setUserInfo } from '../redux/ActionType'
 
 function Header() {
+
+    const dispatch = useDispatch();
+    const userInfo = useSelector(state => state.user);
+
+    const firebaseAuth = getAuth(app);
+    const provider = new GoogleAuthProvider();
+
+    const login = async()=>{
+        const result = await signInWithPopup(firebaseAuth , provider)
+        console.log(result)
+        console.log(userInfo)
+
+       const {user :{ accessToken , providerData}} = await signInWithPopup(firebaseAuth , provider)
+        dispatch(setUserInfo(providerData[0]));
+    }
+
+
   return (
     <header className='fixed z-50 w-screen p-6 px-16'>
         {/* Tablet and Desktop */}
         <div className='hidden md:flex w-full h-full items-center justify-between '>
-                <div className='flex items-center  gap-2'>
+                <Link to={"/"} className='flex items-center  gap-2'>
                     <img src={Logo} alt='logo' className='w-8 object-cover'/>
                     <p className='text-headingColor text-xl font-bold'>City</p>
-                </div>
+                </Link>
                 <div className='flex items-center gap-8'>
                 <ul className='flex items-center gap-8 ml-auto'>
                     <li className='text-base text-textColor motion-safe:hover:scale-110 hover:text-headingColor  duration-100 transition-all ease-in-out cursor-pointer'>Home</li>
@@ -25,7 +49,15 @@ function Header() {
                         <p className='text-xs font-semibold text-white '>2</p>
                     </div>
                 </div>
-                <img src={Avatar} className='w-10 min-w-[40] h-10 min-h-[40] shadow-xl rounded-full cursor-pointer' alt='userprofile'/>
+                <div className='relative'>
+                <motion.img 
+                whileTap={{ scale: 0.8 }} 
+                src={userInfo ? userInfo.photoURL : Avatar} 
+                className='w-10 min-w-[40] h-10 min-h-[40] shadow-xl rounded-full cursor-pointer' 
+                alt='userprofile'
+                onClick={login}
+                />
+                </div>
 
                 </div>
         </div>
