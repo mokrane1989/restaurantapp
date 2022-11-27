@@ -1,7 +1,7 @@
 import { ActionTypes } from "../action-type";
 import { fetchUser } from "../../utils/localStorage";
 
-const userInfo = fetchUser()
+const userInfo = fetchUser();
 const initialState = {
   user: userInfo
 };
